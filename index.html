@@ -1,17 +1,88 @@
 <!DOCTYPE html>
-
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Bangumi Manger - 一个便捷的追番管理器</title>
+<head>
+    <meta charset="UTF-8">
+    <title>Bangumi Manger - 一个便捷的追番管理工具</title>
+    <link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
+    <link rel="stylesheet" href="static/css/font.css">
+    <link rel="stylesheet" href="static/css/icon.css">
+    <link rel="stylesheet" href="static/css/lazy-image-style.min.css">
+    <link rel="stylesheet" href="static/css/app.css">
+</head>
+<body ng-app="bangumi">
 
-        <link rel="stylesheet" type="text/css" href="public/css/main.css">
-    </head>
+<div id="app" ng-controller="AppCtrl as app" ng-cloak>
 
-    <body>
-        <div id="content">
+<!-- title bar start -->
+<div no-select class="titlebar paper-bg-light-black paper-text-white" layout="row" layout-align="start center">
+    <div flex="10"></div>
+    <!-- tab start -->
+    <div layout="row" layout-align="start center">
+        <div class="titlebar-button" ng-class="{active:app.selectedTabName=='home'}" ng-click="app.selectTab('home')">
+            <md-icon icon-font-library="material-icons" aria-label="home">home</md-icon>
+            <p>{{ 'TAG_HOME_NAME' | translate }}</p>
         </div>
+        <div class="titlebar-button" ng-class="{active:app.selectedTabName=='favorite'}" ng-click="app.selectTab('favorite')">
+            <md-icon icon-font-library="material-icons" aria-label="favorite">favorite</md-icon>
+            <p>{{ 'TAG_FAVORITE_NAME' | translate }}</p>
+        </div>
+        <div class="titlebar-button" ng-class="{active:app.selectedTabName=='explore'}" ng-click="app.selectTab('explore')">
+            <md-icon icon-font-library="material-icons" aria-label="explore">explore</md-icon>
+            <p>{{ 'TAG_EXPLORE_NAME' | translate }}</p>
+        </div>
+        <div class="titlebar-button" ng-class="{active:app.selectedTabName=='settings'}" ng-click="app.selectTab('settings')">
+            <md-icon icon-font-library="material-icons" aria-label="settings">settings</md-icon>
+            <p>{{ 'TAG_SETTINGS_NAME' | translate }}</p>
+        </div>
+    </div>
+    <!-- tab end -->
+    <div flex></div>
+    <!-- control start -->
+    <div layout="row" layout-align="start center">
+        <div minimize-button class="titlebar-button">
+            <md-icon icon-font-library="material-icons" aria-label="minimize">keyboard_arrow_down</md-icon>
+        </div>
+        <div close-button class="titlebar-button">
+            <md-icon icon-font-library="material-icons" aria-label="close">close</md-icon>
+        </div>
+    </div>
+    <!-- control end -->
+</div>
+<!-- title bar end -->
 
-        <script src="public/js/bundle.js"></script>
-    </body>
+<!-- tab = home start -->
+<md-content class="paper-bg-white content-high animate-opcity" ng-show="app.selectedTabName=='home'" layout="row" ng-include="'static/view/tab_home.html'"></md-content>
+<!-- tab = home end -->
+
+<!-- tab = explore start -->
+<div class="paper-bg-white animate-opcity" ng-show="app.selectedTabName=='explore'" ng-include="'static/view/tab_explore.html'"></div>
+<!-- tab = explore end -->
+
+<!-- tab = settings start -->
+<div class="paper-bg-white animate-opcity" ng-show="app.selectedTabName=='settings'" ng-include="'static/view/tab_settings.html'"></div>
+<!-- tab = settings end -->
+
+</div><!-- AppCtrl end -->
+
+<script>
+require( './lib/app.js' );
+</script>
+
+<!-- Angular Dependencies -->
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="bower_components/angular-messages/angular-messages.min.js"></script>
+<script src="bower_components/angular-animate/angular-animate.min.js"></script>
+<script src="bower_components/angular-aria/angular-aria.min.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+
+<!-- Angular vendors -->
+<script src="bower_components/angular-material/angular-material.min.js"></script>
+<script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+<script src="bower_components/angular-lazy-img/release/angular-lazy-img.min.js"></script>
+<script src="bower_components/angular-translate/angular-translate.min.js"></script>
+
+<!-- startup angular app -->
+<script src="static/js/bundle.js"></script>
+
+</body>
 </html>

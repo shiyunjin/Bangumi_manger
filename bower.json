@@ -1,0 +1,32 @@
+{
+  "name": "bangumi_manger",
+  "description": "A Bangumi Manger",
+  "main": "main.js",
+  "authors": [
+    "ShiYunJin"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "bangumi",
+    "manger"
+  ],
+  "homepage": "www.shiyunjin.cn",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-lazy-img": "^1.2.2",
+    "angular-material": "^1.1.4",
+    "angular-sanitize": "^1.6.4",
+    "angular-translate": "^2.15.2",
+    "angular-ui-router": "^1.0.4",
+    "angular": "^1.6.4",
+    "angular-animate": "^1.6.4",
+    "angular-aria": "^1.6.4",
+    "angular-messages": "^1.6.4"
+  }
+}
