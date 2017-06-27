@@ -15,11 +15,11 @@ if (isDevelopment) {
     });
 }
 
-let Radioit = require( './lib/radioit.js' );
-Radioit.boot();
+let Manger = require( './lib/manger.js' );
+Manger.boot();
 
 var mainWindow = null;
-var APP_NAME = 'Bangumi Manger'; 
+var APP_NAME = 'Bangumi Manger';
 
 
 let shouldQuit = app.makeSingleInstance( function ( commandLine, workingDirectory ) {
@@ -41,16 +41,16 @@ if ( shouldQuit ) {
 
 function createmainWindow() {
     mainWindow = new BrowserWindow({
-        width: 1024,
-        height: 600,
+        width: 1200,
+        height: 700,
         icon: 'public/img/app-icon.png',
-		resizable: false,
-		'accept-first-mouse': true,
+        resizable: false,
+        'accept-first-mouse': true,
         'title': APP_NAME,
         'show': false,
-		'frame': false,
+        'frame': false,
         'transparent': true
-		
+
     });
 
     if (isDevelopment) {
@@ -62,7 +62,7 @@ function createmainWindow() {
       protocol: 'file:',
       slashes: true
     }));
-	
+
 	mainWindow.webContents.on( 'did-finish-load', function () {
         mainWindow.show();
     });
