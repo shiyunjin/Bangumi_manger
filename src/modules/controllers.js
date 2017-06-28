@@ -1,8 +1,8 @@
 var radioit = require( './main' );
 
 radioit.controller( 'AppCtrl',
-    [ '$scope', '$window', 'bangumiService', '$mdDialog',
-    function ( $scope, $window, bangumiService, $mdDialog) {
+    [ '$scope', '$window', '$mdDialog',
+    function ( $scope, $window, $mdDialog) {
         var vm = this;
 
         vm.selectedTabName = 'home';

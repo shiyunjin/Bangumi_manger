@@ -3,12 +3,7 @@ module.exports = angular.module( 'bangumi', [
     'ngMessages',
     'ui.router',
     'angularLazyImg',
-    'pascalprecht.translate',
-    require( './settings' ).name,
-    require( './catalogue' ).name,
-    require( './weekday' ).name,
-    require( './bangumi' ).name,
-    require( './explorer' ).name
+    require( './settings' ).name
     ])
 
 .config( function ( $stateProvider ) {
@@ -22,8 +17,6 @@ module.exports = angular.module( 'bangumi', [
 .config( function( $logProvider ) {
     $logProvider.debugEnabled( true );
 })
-
-.config( require( './i18n' ) )
 
 .run( function ( $rootScope, $mdToast ) {
     // notification

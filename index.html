@@ -20,19 +20,7 @@
         <div layout="row" layout-align="start center">
             <div class="titlebar-button" ng-class="{active:app.selectedTabName=='home'}" ng-click="app.selectTab('home')">
                 <md-icon icon-font-library="material-icons" aria-label="home">home</md-icon>
-                <p>{{ 'TAG_HOME_NAME' | translate }}</p>
-            </div>
-            <div class="titlebar-button" ng-class="{active:app.selectedTabName=='favorite'}" ng-click="app.selectTab('favorite')">
-                <md-icon icon-font-library="material-icons" aria-label="favorite">favorite</md-icon>
-                <p>{{ 'TAG_FAVORITE_NAME' | translate }}</p>
-            </div>
-            <div class="titlebar-button" ng-class="{active:app.selectedTabName=='explore'}" ng-click="app.selectTab('explore')">
-                <md-icon icon-font-library="material-icons" aria-label="explore">explore</md-icon>
-                <p>{{ 'TAG_EXPLORE_NAME' | translate }}</p>
-            </div>
-            <div class="titlebar-button" ng-class="{active:app.selectedTabName=='settings'}" ng-click="app.selectTab('settings')">
-                <md-icon icon-font-library="material-icons" aria-label="settings">settings</md-icon>
-                <p>{{ 'TAG_SETTINGS_NAME' | translate }}</p>
+                <p>主页</p>
             </div>
         </div>
         <!-- tab end -->
@@ -54,13 +42,6 @@
     <md-content class="paper-bg-white content-high animate-opcity" ng-show="app.selectedTabName=='home'" layout="row" ng-include="'static/view/tab_home.html'"></md-content>
     <!-- tab = home end -->
 
-    <!-- tab = explore start -->
-    <div class="paper-bg-white animate-opcity" ng-show="app.selectedTabName=='explore'" ng-include="'static/view/tab_explore.html'"></div>
-    <!-- tab = explore end -->
-
-    <!-- tab = settings start -->
-    <div class="paper-bg-white animate-opcity" ng-show="app.selectedTabName=='settings'" ng-include="'static/view/tab_settings.html'"></div>
-    <!-- tab = settings end -->
 
 </div><!-- AppCtrl end -->
 
@@ -80,9 +61,7 @@ require( './lib/app.js' );
 <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
 <script src="bower_components/angular-lazy-img/release/angular-lazy-img.min.js"></script>
 <script src="bower_components/angular-translate/angular-translate.min.js"></script>
-
 <!-- startup angular app -->
 <script src="static/js/bundle.js"></script>
-
 </body>
 </html>
