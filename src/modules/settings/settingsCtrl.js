@@ -21,5 +21,9 @@ module.exports = [ '$scope', 'settingsService', '$window',
           { name: '启动后置于托盘', item: 'startup-small' },
           { name: '最小化到托盘', item: 'small-down' }
         ];
+
+        vm.openweb = function () {
+            $window.App.openUrl('http://www.shiyunjin.cn/');
+        };
     }
 ]
