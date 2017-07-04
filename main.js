@@ -43,7 +43,7 @@ function createmainWindow() {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 700,
-        icon: 'public/img/app-icon.png',
+        icon: 'static/image/app-icon.png',
         resizable: false,
         'accept-first-mouse': true,
         'title': APP_NAME,
