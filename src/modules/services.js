@@ -10,5 +10,9 @@ radioit.service( 'appService',
         this.minimize = function () {
             $window.App.minimize();
         };
+
+        this.hide = function () {
+            $window.App.hide();
+        };
     }]
 );

@@ -68,7 +68,35 @@ function createmainWindow() {
     }));
 
 	mainWindow.webContents.on( 'did-finish-load', function () {
-        mainWindow.show();
+        //mainWindow.show();
+        const iconName = 'static/image/app-icon.png';
+        const iconPath = path.join(__dirname, iconName);
+        appIcon = new Tray(iconPath);
+        const contextMenu = Menu.buildFromTemplate([{
+          label: '显示 / 隐藏',
+          click: function () {
+            if(mainWindow.isVisible()){
+              mainWindow.hide();
+            }else{
+              mainWindow.show();
+            }
+          }
+        },{
+          label: '退出 Bangumi Manger',
+          click: function () {
+            appIcon.destroy();
+            app.quit();
+          }
+        }]);
+        appIcon.setToolTip('Bangumi Manger');
+        appIcon.setContextMenu(contextMenu);
+        appIcon.on('click',(event,bounds) => {
+          if(mainWindow.isVisible()){
+            mainWindow.hide();
+          }else{
+            mainWindow.show();
+          }
+        });
     });
 
     mainWindow.on('closed', () => {
@@ -108,40 +136,12 @@ ipcMain.on( 'app-hide', function ( event ) {
     mainWindow.hide();
 });
 
+ipcMain.on( 'app-show', function ( event ) {
+    event.returnValue = true;
+    mainWindow.show();
+});
+
 ipcMain.on( 'app-minimize', function ( event ) {
     event.returnValue = true;
     mainWindow.minimize();
-});
-
-
-
-ipcMain.on('put-in-tray', function (event) {
-  const iconName = 'static/image/app-icon.png';
-  const iconPath = path.join(__dirname, iconName);
-  appIcon = new Tray(iconPath);
-  const contextMenu = Menu.buildFromTemplate([{
-    label: '显示 / 隐藏',
-    click: function () {
-      if(mainWindow.isVisible()){
-        mainWindow.hide();
-      }else{
-        mainWindow.show();
-      }
-    }
-  },{
-    label: '退出 Bangumi Manger',
-    click: function () {
-      appIcon.destroy();
-      app.quit();
-    }
-  }]);
-  appIcon.setToolTip('Bangumi Manger');
-  appIcon.setContextMenu(contextMenu);
-  appIcon.on('click',(event,bounds) => {
-    if(mainWindow.isVisible()){
-      mainWindow.hide();
-    }else{
-      mainWindow.show();
-    }
-  })
 });

@@ -30,6 +30,7 @@ module.exports={
   "author": "ShiYunJin",
   "license": "MIT",
   "dependencies": {
+    "auto-launch": "^5.0.1",
     "bluebird": "^2.9.25",
     "cheerio": "^0.19.0",
     "deepcopy": "^0.5.0",
@@ -91,6 +92,7 @@ radioit.controller( 'AppCtrl',
 },{"./main":5}],3:[function(require,module,exports){
 var radioit = require( './main' );
 
+
 radioit.directive( 'closeButton',
     [ 'appService',
     function ( app ) {
@@ -103,16 +105,22 @@ radioit.directive( 'closeButton',
 )
 
 .directive( 'minimizeButton',
-    [ 'appService',
-    function ( app ) {
+    [ 'appService','settingsService',
+    function ( app , settings ) {
         return function ( scope, el ) {
             el.on( 'click', function () {
-                app.minimize();
+                setting = settings.loadSettings();
+                if(setting.system['small-down']){
+                  app.hide();
+                }else{
+                  app.minimize();
+                }
             });
         }
     }]
 )
 ;
+
 },{"./main":5}],4:[function(require,module,exports){
 require( './main' )
 },{"./main":5}],5:[function(require,module,exports){
@@ -168,6 +176,10 @@ radioit.service( 'appService',
         this.minimize = function () {
             $window.App.minimize();
         };
+
+        this.hide = function () {
+            $window.App.hide();
+        };
     }]
 );
 
@@ -178,8 +190,8 @@ module.exports = angular.module( 'radioit.settings', [] )
 
 .controller( 'SettingsCtrl', require( './settingsCtrl' ) )
 },{"./settingsCtrl":8,"./settingsService":9}],8:[function(require,module,exports){
-module.exports = [ '$scope', 'settingsService',
-    function ( $scope, settingsService ) {
+module.exports = [ '$scope', 'settingsService', '$window',
+    function ( $scope, settingsService, $window ) {
         var vm = this;
         var packageJson = require( '../../../package.json' );
         $scope.author=packageJson.author;
@@ -189,6 +201,11 @@ module.exports = [ '$scope', 'settingsService',
 
         vm.save = function () {
             settingsService.saveSettings( vm.items );
+            if(vm.items.system['startup']){
+              $window.App.startup.install();
+            }else{
+              $window.App.startup.uninstall();
+            }
         };
 
         $scope.systemsettings = [

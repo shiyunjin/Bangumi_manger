@@ -1,5 +1,6 @@
 var radioit = require( './main' );
 
+
 radioit.directive( 'closeButton',
     [ 'appService',
     function ( app ) {
@@ -12,11 +13,16 @@ radioit.directive( 'closeButton',
 )
 
 .directive( 'minimizeButton',
-    [ 'appService',
-    function ( app ) {
+    [ 'appService','settingsService',
+    function ( app , settings ) {
         return function ( scope, el ) {
             el.on( 'click', function () {
-                app.minimize();
+                setting = settings.loadSettings();
+                if(setting.system['small-down']){
+                  app.hide();
+                }else{
+                  app.minimize();
+                }
             });
         }
     }]

@@ -1,5 +1,5 @@
-module.exports = [ '$scope', 'settingsService',
-    function ( $scope, settingsService ) {
+module.exports = [ '$scope', 'settingsService', '$window',
+    function ( $scope, settingsService, $window ) {
         var vm = this;
         var packageJson = require( '../../../package.json' );
         $scope.author=packageJson.author;
@@ -9,6 +9,11 @@ module.exports = [ '$scope', 'settingsService',
 
         vm.save = function () {
             settingsService.saveSettings( vm.items );
+            if(vm.items.system['startup']){
+              $window.App.startup.install();
+            }else{
+              $window.App.startup.uninstall();
+            }
         };
 
         $scope.systemsettings = [
