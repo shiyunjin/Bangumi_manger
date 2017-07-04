@@ -1,19 +1,21 @@
 'use strict';
 
 const electron = require('electron');
-const {app, BrowserWindow, Menu, ipcMain, ipcRenderer} = electron;
+const {app, BrowserWindow, Menu, ipcMain, ipcRenderer, Tray} = electron;
 const env = require( './lib/env.js' );
 
 const path = require('path');
 const url = require('url');
 
-let isDevelopment = false;
+let isDevelopment = true;
 
 if (isDevelopment) {
     require('electron-reload')(__dirname, {
-        ignored: /node_modules|[\/\\]\./
+        ignored: /node_modules|[\/\\]\.|debug\.log/
     });
 }
+
+let appIcon = null;
 
 let Manger = require( './lib/manger.js' );
 Manger.boot();
@@ -49,13 +51,15 @@ function createmainWindow() {
         'title': APP_NAME,
         'show': false,
         'frame': false,
-        'transparent': true
+        'transparent': true,
+        fullscreen: false
 
     });
 
     if (isDevelopment) {
         mainWindow.webContents.openDevTools();
     }
+
 
     mainWindow.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
@@ -99,7 +103,45 @@ ipcMain.on( 'app-quit', function ( event ) {
     mainWindow.close();
 });
 
+ipcMain.on( 'app-hide', function ( event ) {
+    event.returnValue = true;
+    mainWindow.hide();
+});
+
 ipcMain.on( 'app-minimize', function ( event ) {
     event.returnValue = true;
     mainWindow.minimize();
+});
+
+
+
+ipcMain.on('put-in-tray', function (event) {
+  const iconName = 'static/image/app-icon.png';
+  const iconPath = path.join(__dirname, iconName);
+  appIcon = new Tray(iconPath);
+  const contextMenu = Menu.buildFromTemplate([{
+    label: '显示 / 隐藏',
+    click: function () {
+      if(mainWindow.isVisible()){
+        mainWindow.hide();
+      }else{
+        mainWindow.show();
+      }
+    }
+  },{
+    label: '退出 Bangumi Manger',
+    click: function () {
+      appIcon.destroy();
+      app.quit();
+    }
+  }]);
+  appIcon.setToolTip('Bangumi Manger');
+  appIcon.setContextMenu(contextMenu);
+  appIcon.on('click',(event,bounds) => {
+    if(mainWindow.isVisible()){
+      mainWindow.hide();
+    }else{
+      mainWindow.show();
+    }
+  })
 });

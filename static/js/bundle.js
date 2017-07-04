@@ -1,4 +1,69 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports={
+  "name": "bangumi_manger",
+  "version": "1.0.0",
+  "description": "A Bangumi Manger",
+  "main": "main.js",
+  "scripts": {
+    "clean:test": "rimraf test",
+    "clean:dist": "rimraf dist",
+    "build:css": "stylus -u nib src/css/app.styl -o static/css/app.css",
+    "build:js": "browserify src/modules/entry.js -o static/js/bundle.js",
+    "release:css": "stylus -u nib src/css/app.styl -o static/css/app.css -c",
+    "release:js": "browserify src/modules/entry.js | uglifyjs > static/js/bundle.js",
+    "watch:css": "stylus -u nib src/css/app.styl -o static/css/app.css -w",
+    "watch:js": "watchify src/modules/entry.js -o static/js/bundle.js",
+    "test": "electron --debug main.js --development",
+    "test:js": "parallelshell \"npm run watch:js\" \"npm run test\"",
+    "start": "npm run build:js && npm run build:css && electron main.js --enable-logging 2>&1 | silence-chromium",
+    "asar": "asar ./ BangumiManger.asar",
+    "package": "electron-packager . BangumiManger --platform=win32,darwin,linux --arch=all --electron-version=1.4.13 --icon=static/image/app.ico --overwrite --out=dist/ --ignore=./src --ignore=.git --ignore=dist --asar=true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.oschina.net/swapteam/bangumi_manger.git"
+  },
+  "keywords": [
+    "bangumi",
+    "manger"
+  ],
+  "author": "ShiYunJin",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^2.9.25",
+    "cheerio": "^0.19.0",
+    "deepcopy": "^0.5.0",
+    "extend": "^2.0.1",
+    "superagent": "^1.2.0",
+    "superagent-bluebird-promise": "^2.0.2",
+    "superagent-proxy": "^0.3.2"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-plugin-transform-es2015-spread": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "electron-packager": "^8.7.2",
+    "electron-reload": "^1.2.1",
+    "electron-prebuilt": "latest",
+    "asar": "latest",
+    "jshint": "latest",
+    "mkdirp": "latest",
+    "nib": "latest",
+    "parallelshell": "latest",
+    "rimraf": "latest",
+    "silence-chromium": "latest",
+    "stylus": "latest",
+    "uglifyjs": "latest",
+    "watchify": "^3.9.0",
+    "bower": "latest"
+  }
+}
+
+},{}],2:[function(require,module,exports){
 var radioit = require( './main' );
 
 radioit.controller( 'AppCtrl',
@@ -23,7 +88,7 @@ radioit.controller( 'AppCtrl',
 )
 ;
 
-},{"./main":4}],2:[function(require,module,exports){
+},{"./main":5}],3:[function(require,module,exports){
 var radioit = require( './main' );
 
 radioit.directive( 'closeButton',
@@ -48,9 +113,9 @@ radioit.directive( 'closeButton',
     }]
 )
 ;
-},{"./main":4}],3:[function(require,module,exports){
+},{"./main":5}],4:[function(require,module,exports){
 require( './main' )
-},{"./main":4}],4:[function(require,module,exports){
+},{"./main":5}],5:[function(require,module,exports){
 module.exports = angular.module( 'bangumi', [
     'ngMaterial',
     'ngMessages',
@@ -90,7 +155,7 @@ require( './services' );
 require( './controllers' );
 require( './directives' );
 
-},{"./controllers":1,"./directives":2,"./services":5,"./settings":6}],5:[function(require,module,exports){
+},{"./controllers":2,"./directives":3,"./services":6,"./settings":7}],6:[function(require,module,exports){
 var radioit = require( './main' );
 
 radioit.service( 'appService',
@@ -106,29 +171,35 @@ radioit.service( 'appService',
     }]
 );
 
-},{"./main":4}],6:[function(require,module,exports){
+},{"./main":5}],7:[function(require,module,exports){
 module.exports = angular.module( 'radioit.settings', [] )
 
 .service( 'settingsService', require( './settingsService' ) )
 
 .controller( 'SettingsCtrl', require( './settingsCtrl' ) )
-},{"./settingsCtrl":7,"./settingsService":8}],7:[function(require,module,exports){
-module.exports = [ '$scope', '$translate', 'settingsService',
-    function ( $scope, $translate, settingsService ) {
+},{"./settingsCtrl":8,"./settingsService":9}],8:[function(require,module,exports){
+module.exports = [ '$scope', 'settingsService',
+    function ( $scope, settingsService ) {
         var vm = this;
+        var packageJson = require( '../../../package.json' );
+        $scope.author=packageJson.author;
+        $scope.version=packageJson.version;
 
         vm.items = settingsService.loadSettings();
 
-        vm.changeLanguage = function () {
-            $translate.use( vm.items.language );
-        };
-
         vm.save = function () {
             settingsService.saveSettings( vm.items );
-        }
+        };
+
+        $scope.systemsettings = [
+          { name: '随着系统启动', item: 'startup' },
+          { name: '启动后置于托盘', item: 'startup-small' },
+          { name: '最小化到托盘', item: 'small-down' }
+        ];
     }
 ]
-},{}],8:[function(require,module,exports){
+
+},{"../../../package.json":1}],9:[function(require,module,exports){
 module.exports = [ '$window',
     function ( $window ) {
         this.loadSettings = function () {
@@ -140,4 +211,4 @@ module.exports = [ '$window',
         }
     }
 ]
-},{}]},{},[3]);
+},{}]},{},[4]);
