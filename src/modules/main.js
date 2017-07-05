@@ -3,7 +3,8 @@ module.exports = angular.module( 'bangumi', [
     'ngMessages',
     'ui.router',
     'angularLazyImg',
-    require( './settings' ).name
+    require( './settings' ).name,
+    require( './weikan' ).name
     ])
 
 .config( function ( $stateProvider ) {

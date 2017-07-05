@@ -1,4 +1,4 @@
-module.exports = angular.module( 'radioit.settings', [] )
+module.exports = angular.module( 'bangumi.settings', [] )
 
 .service( 'settingsService', require( './settingsService' ) )
 

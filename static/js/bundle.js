@@ -134,7 +134,8 @@ module.exports = angular.module( 'bangumi', [
     'ngMessages',
     'ui.router',
     'angularLazyImg',
-    require( './settings' ).name
+    require( './settings' ).name,
+    require( './weikan' ).name
     ])
 
 .config( function ( $stateProvider ) {
@@ -168,7 +169,7 @@ require( './services' );
 require( './controllers' );
 require( './directives' );
 
-},{"./controllers":2,"./directives":3,"./services":6,"./settings":7}],6:[function(require,module,exports){
+},{"./controllers":2,"./directives":3,"./services":6,"./settings":7,"./weikan":10}],6:[function(require,module,exports){
 var radioit = require( './main' );
 
 radioit.service( 'appService',
@@ -189,11 +190,12 @@ radioit.service( 'appService',
 );
 
 },{"./main":5}],7:[function(require,module,exports){
-module.exports = angular.module( 'radioit.settings', [] )
+module.exports = angular.module( 'bangumi.settings', [] )
 
 .service( 'settingsService', require( './settingsService' ) )
 
 .controller( 'SettingsCtrl', require( './settingsCtrl' ) )
+
 },{"./settingsCtrl":8,"./settingsService":9}],8:[function(require,module,exports){
 module.exports = [ '$scope', 'settingsService', '$window',
     function ( $scope, settingsService, $window ) {
@@ -202,7 +204,11 @@ module.exports = [ '$scope', 'settingsService', '$window',
         $scope.author=packageJson.author;
         $scope.version=packageJson.version;
 
+        ipcRenderer = $window.App.ipcRenderer;
+
         vm.items = settingsService.loadSettings();
+
+        $scope.fooder = vm.items.fooder;
 
         vm.save = function () {
             settingsService.saveSettings( vm.items );
@@ -223,6 +229,19 @@ module.exports = [ '$scope', 'settingsService', '$window',
         vm.openweb = function () {
             $window.App.openUrl('http://www.shiyunjin.cn/');
         };
+
+        vm.setweikan = function () {
+            $window.App.openfooder('weikan');
+        };
+
+        vm.setkanwan = function () {
+            $window.App.openfooder('kanwan');
+        };
+
+        ipcRenderer.on('selected-directory',function (event, name, path) {
+            $scope.fooder[name] = path[0];
+            vm.items.fooder = $scope.fooder;
+        });
     }
 ]
 
@@ -238,4 +257,25 @@ module.exports = [ '$window',
         }
     }
 ]
+},{}],10:[function(require,module,exports){
+module.exports = angular.module( 'bangumi.weikan', [] )
+
+.service( 'weikanService', require( './weikanService' ) )
+
+.controller( 'weikanCtrl', require( './weikanCtrl' ) )
+
+},{"./weikanCtrl":11,"./weikanService":12}],11:[function(require,module,exports){
+module.exports = [ '$scope', 'weikanService', '$window',
+    function ( $scope, weikanService, $window ) {
+
+    }
+];
+
+},{}],12:[function(require,module,exports){
+module.exports = [ '$window',
+    function ( $window ) {
+        
+    }
+]
+
 },{}]},{},[4]);

@@ -196,6 +196,9 @@ body {
   background: transparent;
   font-family: Microsoft YaHei;
 }
+body md-list {
+  padding: 0px 0;
+}
 h1,
 h2,
 h3,

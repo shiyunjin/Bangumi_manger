@@ -1,7 +1,7 @@
 'use strict';
 
 const electron = require('electron');
-const {app, BrowserWindow, Menu, ipcMain, ipcRenderer, Tray} = electron;
+const {app, BrowserWindow, Menu, ipcMain, ipcRenderer, Tray, dialog} = electron;
 const env = require( './lib/env.js' );
 
 const path = require('path');
@@ -144,4 +144,12 @@ ipcMain.on( 'app-show', function ( event ) {
 ipcMain.on( 'app-minimize', function ( event ) {
     event.returnValue = true;
     mainWindow.minimize();
+});
+
+ipcMain.on('open-directory-dialog', function (event,name) {
+  dialog.showOpenDialog({
+    properties: ['openDirectory']
+  },function (path) {
+    if (path) event.sender.send('selected-directory', name, path);
+  });
 });
