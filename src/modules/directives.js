@@ -2,11 +2,16 @@ var radioit = require( './main' );
 
 
 radioit.directive( 'closeButton',
-    [ 'appService',
-    function ( app ) {
+    [ 'appService','settingsService',
+    function ( app , settings ) {
         return function ( scope, el ) {
             el.on( 'click', function () {
-                app.quit();
+                setting = settings.loadSettings();
+                if(setting.system['small-quit']){
+                  app.quit();
+                }else{
+                  app.hide();
+                }
             });
         }
     }]

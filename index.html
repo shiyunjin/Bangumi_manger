@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="static/css/lazy-image-style.min.css">
     <link rel="stylesheet" href="static/css/app.css">
 </head>
-<body ng-app="bangumi">
+<body ng-app="bangumi" unselectable="on" style="-moz-user-select:none;-webkit-user-select:none;" onselectstart="return false;">
 
 <div id="app" ng-controller="AppCtrl as app" ng-cloak>
 
@@ -66,6 +66,7 @@
 </div><!-- AppCtrl end -->
 
 <script>
+document.ondragstart=function() {return false;}
 require( './lib/app.js' );
 </script>
 
