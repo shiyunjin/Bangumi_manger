@@ -9,11 +9,11 @@ const url = require('url');
 
 let isDevelopment = true;
 
-if (isDevelopment) {
-    require('electron-reload')(__dirname, {
-        ignored: /node_modules|[\/\\]\.|debug\.log/
-    });
-}
+// if (isDevelopment) {
+//     require('electron-reload')(__dirname, {
+//         ignored: /node_modules|[\/\\]\.|debug\.log/
+//     });
+// }
 
 let appIcon = null;
 
