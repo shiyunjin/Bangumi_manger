@@ -42,6 +42,8 @@ module.exports = [ '$scope', 'settingsService', '$window',
         ipcRenderer.on('selected-directory',function (event, name, path) {
             $scope.fooder[name] = path[0];
             vm.items.fooder = $scope.fooder;
+            vm.save();
+            $scope.$apply();
         });
     }
 ]
