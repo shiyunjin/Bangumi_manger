@@ -5,7 +5,7 @@ radioit.controller( 'AppCtrl',
     function ( $scope, $window, $mdDialog) {
         var vm = this;
 
-        vm.selectedTabName = 'home';
+        vm.selectedTabName = 'weikan';
 
         vm.selectTab = function ( tabName ) {
             vm.selectedTabName = tabName;

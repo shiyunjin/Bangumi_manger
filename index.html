@@ -17,12 +17,12 @@
     <div no-select class="titlebar paper-bg-light-black paper-text-white" layout="row" layout-align="start center">
         <div flex="0"></div>
         <!-- tab start -->
-        <div layout="row" layout-align="start center">
+        <!-- <div layout="row" layout-align="start center">
             <div class="titlebar-button" ng-class="{active:app.selectedTabName=='home'}" ng-click="app.selectTab('home')">
                 <md-icon icon-font-library="material-icons" aria-label="home">home</md-icon>
                 <p>主页</p>
             </div>
-        </div>
+        </div> -->
         <div layout="row" layout-align="start center">
             <div class="titlebar-button" ng-class="{active:app.selectedTabName=='weikan'}" ng-click="app.selectTab('weikan')">
                 <md-icon icon-font-library="material-icons" aria-label="video_library">video_library</md-icon>
@@ -57,7 +57,7 @@
     <!-- title bar end -->
 
     <!-- tab = home start -->
-    <md-content class="paper-bg-white content-high animate-opcity" ng-show="app.selectedTabName=='home'" layout="row" ng-include="'static/view/tab_home.html'"></md-content>
+    <!-- <md-content class="paper-bg-white content-high animate-opcity" ng-show="app.selectedTabName=='home'" layout="row" ng-include="'static/view/tab_home.html'"></md-content> -->
     <!-- tab = home end -->
 
     <md-content class="paper-bg-white content-high animate-opcity" ng-show="app.selectedTabName=='weikan'" layout="row" ng-include="'static/view/tab_weikan.html'"></md-content>

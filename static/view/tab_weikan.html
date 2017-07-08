@@ -40,7 +40,7 @@
   </md-toolbar>
   <md-virtual-repeat-container ng-style="liststyle">
     <md-list ng-cloak>
-      <md-list-item class="secondary-button-padding"  ng-click="goToPerson(person.name, $event)" md-virtual-repeat="item in weikan_list_menu">
+      <md-list-item class="secondary-button-padding"  ng-click="goToPerson(person.name, $event)" md-virtual-repeat="item in weikan_list_menu | orderBy: item:false">
         <p>{{item}}</p>
 
         <md-icon icon-font-library="material-icons"  ng-click="doSecondaryAction($event)" aria-label="top" class="md-secondary md-hue-3" >eject</md-icon>

@@ -73,7 +73,7 @@ radioit.controller( 'AppCtrl',
     function ( $scope, $window, $mdDialog) {
         var vm = this;
 
-        vm.selectedTabName = 'home';
+        vm.selectedTabName = 'weikan';
 
         vm.selectTab = function ( tabName ) {
             vm.selectedTabName = tabName;
@@ -90,7 +90,7 @@ radioit.controller( 'AppCtrl',
 )
 ;
 
-},{"./main":5}],3:[function(require,module,exports){
+},{"./main":6}],3:[function(require,module,exports){
 var radioit = require( './main' );
 
 
@@ -127,243 +127,9 @@ radioit.directive( 'closeButton',
 )
 ;
 
-},{"./main":5}],4:[function(require,module,exports){
+},{"./main":6}],4:[function(require,module,exports){
 require( './main' )
-},{"./main":5}],5:[function(require,module,exports){
-module.exports = angular.module( 'bangumi', [
-    'ngMaterial',
-    'ngMessages',
-    'ui.router',
-    'angularLazyImg',
-    require( './settings' ).name,
-    require( './weikan' ).name
-    ])
-
-.config( function ( $stateProvider ) {
-    $stateProvider
-        .state( 'index', {
-            url: '/',
-            templateUrl: 'static/view/default.html'
-        });
-})
-
-.config( function( $logProvider ) {
-    $logProvider.debugEnabled( true );
-})
-
-.run( function ( $rootScope, $mdToast ) {
-    // notification
-    $rootScope.$on( 'notify', function ( e, text, hideDelay ) {
-        text = text || '';
-        hideDelay = hideDelay || 0;
-        $mdToast.show(
-            $mdToast.simple()
-                .content( text )
-                .position( 'bottom left' )
-                .hideDelay( hideDelay )
-        );
-    });
-})
-;
-
-require( './services' );
-require( './controllers' );
-require( './directives' );
-
-},{"./controllers":2,"./directives":3,"./services":6,"./settings":7,"./weikan":10}],6:[function(require,module,exports){
-var radioit = require( './main' );
-
-radioit.service( 'appService',
-    [ '$window',
-    function ( $window ) {
-        this.quit = function () {
-            $window.App.quit();
-        };
-
-        this.minimize = function () {
-            $window.App.minimize();
-        };
-
-        this.hide = function () {
-            $window.App.hide();
-        };
-    }]
-);
-
-},{"./main":5}],7:[function(require,module,exports){
-module.exports = angular.module( 'bangumi.settings', [] )
-
-.service( 'settingsService', require( './settingsService' ) )
-
-.controller( 'SettingsCtrl', require( './settingsCtrl' ) )
-
-},{"./settingsCtrl":8,"./settingsService":9}],8:[function(require,module,exports){
-module.exports = [ '$scope', 'settingsService', '$window',
-    function ( $scope, settingsService, $window ) {
-        var vm = this;
-        var packageJson = require( '../../../package.json' );
-        $scope.author=packageJson.author;
-        $scope.version=packageJson.version;
-
-        ipcRenderer = $window.App.ipcRenderer;
-
-        vm.items = settingsService.loadSettings();
-
-        $scope.fooder = vm.items.fooder;
-
-        vm.save = function () {
-            settingsService.saveSettings( vm.items );
-            if(vm.items.system['startup']){
-              $window.App.startup.install();
-            }else{
-              $window.App.startup.uninstall();
-            }
-        };
-
-        $scope.systemsettings = [
-          { name: '随着系统启动', item: 'startup' },
-          { name: '启动后置于托盘', item: 'startup-small' },
-          { name: '最小化到托盘', item: 'small-down' },
-          { name: '关闭按钮退出程序', item: 'small-quit' }
-        ];
-
-        vm.openweb = function () {
-            $window.App.openUrl('http://www.shiyunjin.cn/');
-        };
-
-        vm.setweikan = function () {
-            $window.App.openfooder('weikan');
-        };
-
-        vm.setkanwan = function () {
-            $window.App.openfooder('kanwan');
-        };
-
-        ipcRenderer.on('selected-directory',function (event, name, path) {
-            $scope.fooder[name] = path[0];
-            vm.items.fooder = $scope.fooder;
-            vm.save();
-            $scope.$apply();
-        });
-    }
-]
-
-},{"../../../package.json":1}],9:[function(require,module,exports){
-module.exports = [ '$window',
-    function ( $window ) {
-        this.loadSettings = function () {
-            return $window.App.settings.load();
-        };
-
-        this.saveSettings = function ( settings ) {
-            $window.App.settings.save( settings );
-        }
-    }
-]
-},{}],10:[function(require,module,exports){
-module.exports = angular.module( 'bangumi.weikan', [] )
-
-.service( 'weikanService', require( './weikanService' ) )
-
-.controller( 'weikanCtrl', require( './weikanCtrl' ) )
-
-},{"./weikanCtrl":11,"./weikanService":12}],11:[function(require,module,exports){
-module.exports = [ '$scope', 'weikanService', '$window', 'settingsService',
-    function ( $scope, weikanService, $window, settingsService ) {
-        var vm = this;
-
-        vm.settings = settingsService.loadSettings();
-
-        $scope.timelist = [
-          {'id':0,'title':'5 分钟','number':'5','bei':'60'},
-          {'id':1,'title':'10 分钟','number':'10','bei':'60'},
-          {'id':2,'title':'30 分钟','number':'30','bei':'60'}
-        ];
-
-        var timeClock = null;
-
-        $scope.weikan_file_list = [];
-        $scope.weikan_video_list = [];
-        $scope.weikan_list = [];
-        $scope.weikan_list_menu = [];
-        $scope.weikan_list_content = {};
-        $scope.weikan_count = 0;
-
-        $scope.liststyle = {
-            'width': '100%',
-            'height': '581px'
-        };
-        $scope.loading = true;
-
-        vm.flushdir = function () {
-            $scope.loading = true;
-
-            var block_test_list={};
-
-            $scope.weikan_file_list = [];
-            $scope.weikan_video_list = [];
-            $scope.weikan_list = [];
-            $scope.weikan_list_menu = [];
-            $scope.weikan_list_content = {};
-            $scope.weikan_count = 0;
-
-            if(vm.settings.fooder.weikan){
-              $window.App.fs.readdir(vm.settings.fooder.weikan,function (err, files) {
-                $scope.weikan_file_list=files;
-                if($scope.weikan_file_list.length){
-                  $scope.weikan_file_list.forEach(function (key) {
-                    var ext=key.substring(key.lastIndexOf('.') + 1).toLowerCase();
-                    if(ext=='mp4'){
-                      $scope.weikan_video_list.push(key);
-                    }
-                  });
-                  $scope.weikan_video_list.forEach(function (key) {
-                    switch(key.substr(0,1)) {
-                      case '[':
-                        weikanService.getfang(key,block_test_list,function (obj) {
-                          $scope.weikan_list.push(obj);
-                          var lowname = obj.name.toLowerCase();
-                          if(typeof($scope.weikan_list_content[lowname])=="undefined"){
-                            $scope.weikan_list_menu.push(obj.name);
-                            $scope.weikan_list_content[lowname]=[];
-                          }
-                          $scope.weikan_list_content[lowname].push(obj);
-                          $scope.weikan_count++;
-                        });
-                      break;
-                      case '【':
-
-                      break;
-                      default:
-
-                      break;
-                    }
-                  });
-                  $scope.loading = false;
-                  $scope.$apply();
-                }
-              });
-            };
-        };
-
-        vm.settime = function (id) {
-          vm.settings.weikan.flushtime = id;
-          settingsService.saveSettings( vm.settings );
-          clearTimeout(timeClock);
-          $scope.load();
-        };
-
-        $scope.load = function () {
-          vm.flushdir();
-          timeClock = setInterval( function () {
-            vm.flushdir();
-            $scope.$apply();
-          }, 1000 * $scope.timelist[vm.settings.weikan.flushtime].number * $scope.timelist[vm.settings.weikan.flushtime].bei);
-        }
-    }
-];
-
-},{}],12:[function(require,module,exports){
+},{"./main":6}],5:[function(require,module,exports){
 module.exports = [ '$window',
     function ( $window ) {
         this.getfang = function ( key , block_test_list, callback ) {
@@ -508,6 +274,250 @@ module.exports = [ '$window',
           var obj = str.split(' - ');
           return obj;
         };
+    }
+]
+
+},{}],6:[function(require,module,exports){
+module.exports = angular.module( 'bangumi', [
+    'ngMaterial',
+    'ngMessages',
+    'ui.router',
+    'angularLazyImg',
+    require( './settings' ).name,
+    require( './weikan' ).name
+    ])
+
+.config( function ( $stateProvider ) {
+    $stateProvider
+        .state( 'index', {
+            url: '/',
+            templateUrl: 'static/view/default.html'
+        });
+})
+
+.config( function( $logProvider ) {
+    $logProvider.debugEnabled( true );
+})
+
+.run( function ( $rootScope, $mdToast ) {
+    // notification
+    $rootScope.$on( 'notify', function ( e, text, hideDelay ) {
+        text = text || '';
+        hideDelay = hideDelay || 0;
+        $mdToast.show(
+            $mdToast.simple()
+                .content( text )
+                .position( 'bottom left' )
+                .hideDelay( hideDelay )
+        );
+    });
+})
+
+.service( 'ListService', require( './list' ) )
+
+;
+
+require( './services' );
+require( './controllers' );
+require( './directives' );
+
+},{"./controllers":2,"./directives":3,"./list":5,"./services":7,"./settings":8,"./weikan":11}],7:[function(require,module,exports){
+var radioit = require( './main' );
+
+radioit.service( 'appService',
+    [ '$window',
+    function ( $window ) {
+        this.quit = function () {
+            $window.App.quit();
+        };
+
+        this.minimize = function () {
+            $window.App.minimize();
+        };
+
+        this.hide = function () {
+            $window.App.hide();
+        };
+    }]
+);
+
+},{"./main":6}],8:[function(require,module,exports){
+module.exports = angular.module( 'bangumi.settings', [] )
+
+.service( 'settingsService', require( './settingsService' ) )
+
+.controller( 'SettingsCtrl', require( './settingsCtrl' ) )
+
+},{"./settingsCtrl":9,"./settingsService":10}],9:[function(require,module,exports){
+module.exports = [ '$scope', 'settingsService', '$window',
+    function ( $scope, settingsService, $window ) {
+        var vm = this;
+        var packageJson = require( '../../../package.json' );
+        $scope.author=packageJson.author;
+        $scope.version=packageJson.version;
+
+        ipcRenderer = $window.App.ipcRenderer;
+
+        vm.items = settingsService.loadSettings();
+
+        $scope.fooder = vm.items.fooder;
+
+        vm.save = function () {
+            settingsService.saveSettings( vm.items );
+            if(vm.items.system['startup']){
+              $window.App.startup.install();
+            }else{
+              $window.App.startup.uninstall();
+            }
+        };
+
+        $scope.systemsettings = [
+          { name: '随着系统启动', item: 'startup' },
+          { name: '启动后置于托盘', item: 'startup-small' },
+          { name: '最小化到托盘', item: 'small-down' },
+          { name: '关闭按钮退出程序', item: 'small-quit' }
+        ];
+
+        vm.openweb = function () {
+            $window.App.openUrl('http://www.shiyunjin.cn/');
+        };
+
+        vm.setweikan = function () {
+            $window.App.openfooder('weikan');
+        };
+
+        vm.setkanwan = function () {
+            $window.App.openfooder('kanwan');
+        };
+
+        ipcRenderer.on('selected-directory',function (event, name, path) {
+            $scope.fooder[name] = path[0];
+            vm.items.fooder = $scope.fooder;
+            vm.save();
+            $scope.$apply();
+        });
+    }
+]
+
+},{"../../../package.json":1}],10:[function(require,module,exports){
+module.exports = [ '$window',
+    function ( $window ) {
+        this.loadSettings = function () {
+            return $window.App.settings.load();
+        };
+
+        this.saveSettings = function ( settings ) {
+            $window.App.settings.save( settings );
+        }
+    }
+]
+},{}],11:[function(require,module,exports){
+module.exports = angular.module( 'bangumi.weikan', [] )
+
+.service( 'weikanService', require( './weikanService' ) )
+
+.controller( 'weikanCtrl', require( './weikanCtrl' ) )
+
+},{"./weikanCtrl":12,"./weikanService":13}],12:[function(require,module,exports){
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService',
+    function ( $scope, weikanService, $window, settingsService, ListService ) {
+        var vm = this;
+
+        vm.settings = settingsService.loadSettings();
+
+        $scope.timelist = [
+          {'id':0,'title':'5 分钟','number':'5','bei':'60'},
+          {'id':1,'title':'10 分钟','number':'10','bei':'60'},
+          {'id':2,'title':'30 分钟','number':'30','bei':'60'}
+        ];
+
+        var timeClock = null;
+
+        $scope.weikan_file_list = [];
+        $scope.weikan_video_list = [];
+        $scope.weikan_list = [];
+        $scope.weikan_list_menu = [];
+        $scope.weikan_list_content = {};
+        $scope.weikan_count = 0;
+
+        $scope.liststyle = {
+            'width': '100%',
+            'height': '581px'
+        };
+        $scope.loading = true;
+
+        vm.flushdir = function () {
+            $scope.loading = true;
+
+            var block_test_list={};
+
+            $scope.weikan_file_list = [];
+            $scope.weikan_video_list = [];
+            $scope.weikan_list = [];
+            $scope.weikan_list_menu = [];
+            $scope.weikan_list_content = {};
+            $scope.weikan_count = 0;
+
+            if(vm.settings.fooder.weikan){
+              $window.App.fs.readdir(vm.settings.fooder.weikan,function (err, files) {
+                $scope.weikan_file_list=files;
+                if($scope.weikan_file_list.length){
+                  $scope.weikan_file_list.forEach(function (key) {
+                    var ext=key.substring(key.lastIndexOf('.') + 1).toLowerCase();
+                    if(ext=='mp4'){
+                      $scope.weikan_video_list.push(key);
+                    }
+                  });
+                  $scope.weikan_video_list.forEach(function (key) {
+                    switch(key.substr(0,1)) {
+                      case '[':
+                        ListService.getfang(key,block_test_list,function (obj) {
+                          $scope.weikan_list.push(obj);
+                          var lowname = obj.name.toLowerCase();
+                          if(typeof($scope.weikan_list_content[lowname])=="undefined"){
+                            $scope.weikan_list_menu.push(obj.name);
+                            $scope.weikan_list_content[lowname]=[];
+                          }
+                          $scope.weikan_list_content[lowname].push(obj);
+                          $scope.weikan_count++;
+                        });
+                      break;
+                      case '【':
+
+                      break;
+                      default:
+
+                      break;
+                    }
+                  });
+                  $scope.loading = false;
+                  $scope.$apply();
+                }
+              });
+            };
+        };
+
+        vm.settime = function (id) {
+          vm.settings.weikan.flushtime = id;
+          settingsService.saveSettings( vm.settings );
+          clearTimeout(timeClock);
+          $scope.load();
+        };
+
+        $scope.load = function () {
+          vm.flushdir();
+          timeClock = setInterval( function () {
+            vm.flushdir();
+            $scope.$apply();
+          }, 1000 * $scope.timelist[vm.settings.weikan.flushtime].number * $scope.timelist[vm.settings.weikan.flushtime].bei);
+        }
+    }
+];
+
+},{}],13:[function(require,module,exports){
+module.exports = [ '$window',
+    function ( $window ) {
+        
     }
 ]
 

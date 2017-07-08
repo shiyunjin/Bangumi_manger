@@ -1,5 +1,5 @@
-module.exports = [ '$scope', 'weikanService', '$window', 'settingsService',
-    function ( $scope, weikanService, $window, settingsService ) {
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService',
+    function ( $scope, weikanService, $window, settingsService, ListService ) {
         var vm = this;
 
         vm.settings = settingsService.loadSettings();
@@ -50,7 +50,7 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService',
                   $scope.weikan_video_list.forEach(function (key) {
                     switch(key.substr(0,1)) {
                       case '[':
-                        weikanService.getfang(key,block_test_list,function (obj) {
+                        ListService.getfang(key,block_test_list,function (obj) {
                           $scope.weikan_list.push(obj);
                           var lowname = obj.name.toLowerCase();
                           if(typeof($scope.weikan_list_content[lowname])=="undefined"){

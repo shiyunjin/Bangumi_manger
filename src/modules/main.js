@@ -32,6 +32,9 @@ module.exports = angular.module( 'bangumi', [
         );
     });
 })
+
+.service( 'ListService', require( './list' ) )
+
 ;
 
 require( './services' );
