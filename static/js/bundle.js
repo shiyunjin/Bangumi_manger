@@ -17,7 +17,7 @@ module.exports={
     "test:js": "parallelshell \"npm run watch:js\" \"npm run test\"",
     "start": "npm run build:js && npm run build:css && electron main.js --enable-logging 2>&1 | silence-chromium",
     "asar": "asar ./ BangumiManger.asar",
-    "package": "electron-packager . BangumiManger --platform=win32,darwin,linux --arch=all --electron-version=1.4.13 --icon=static/image/app.ico --overwrite --out=dist/ --ignore=./src --ignore=.git --ignore=dist --asar=true"
+    "package": "electron-packager . BangumiManger --platform=win32,darwin,linux --arch=all --electron-version=1.4.13 --icon=static/image/app.ico --overwrite --out=dist/ --ignore=./src --ignore=.git --ignore=dist --asar=true --download.mirror=https://npm.taobao.org/mirrors/electron/"
   },
   "repository": {
     "type": "git",
