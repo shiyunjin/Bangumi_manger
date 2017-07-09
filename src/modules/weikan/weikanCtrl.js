@@ -1,5 +1,5 @@
-module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService',
-    function ( $scope, weikanService, $window, settingsService, ListService ) {
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast',
+    function ( $scope, weikanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast ) {
         var vm = this;
 
         vm.settings = settingsService.loadSettings();
@@ -89,6 +89,24 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
             vm.flushdir();
             $scope.$apply();
           }, 1000 * $scope.timelist[vm.settings.weikan.flushtime].number * $scope.timelist[vm.settings.weikan.flushtime].bei);
-        }
+        };
+
+        $scope.showGridBottomSheet = function() {
+          $scope.alert = '';
+          $mdBottomSheet.show({
+            templateUrl: 'static/view/play-grid.html',
+            controller: 'GridPlayCtrl',
+            clickOutsideToClose: false
+          }).then(function(clickedItem) {
+            $mdToast.show(
+                  $mdToast.simple()
+                    .textContent(clickedItem['name'] + ' clicked!')
+                    .position('top right')
+                    .hideDelay(1500)
+                );
+          }).catch(function(error) {
+            // User clicked outside or hit escape
+          });
+        };
     }
 ];

@@ -321,7 +321,7 @@ require( './services' );
 require( './controllers' );
 require( './directives' );
 
-},{"./controllers":2,"./directives":3,"./list":5,"./services":7,"./settings":8,"./weikan":11}],7:[function(require,module,exports){
+},{"./controllers":2,"./directives":3,"./list":5,"./services":7,"./settings":8,"./weikan":12}],7:[function(require,module,exports){
 var radioit = require( './main' );
 
 radioit.service( 'appService',
@@ -412,15 +412,36 @@ module.exports = [ '$window',
     }
 ]
 },{}],11:[function(require,module,exports){
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService',
+    function ( $scope, weikanService, $window, settingsService, ListService ) {
+      $scope.items = [
+        { name: 'Hangout', icon: 'hangout' },
+        { name: 'Mail', icon: 'mail' },
+        { name: 'Message', icon: 'message' },
+        { name: 'Copy', icon: 'copy2' },
+        { name: 'Facebook', icon: 'facebook' },
+        { name: 'Twitter', icon: 'twitter' },
+      ];
+
+      $scope.listItemClick = function($index) {
+        var clickedItem = $scope.items[$index];
+        $mdBottomSheet.hide(clickedItem);
+      };
+    }
+];
+
+},{}],12:[function(require,module,exports){
 module.exports = angular.module( 'bangumi.weikan', [] )
 
 .service( 'weikanService', require( './weikanService' ) )
 
 .controller( 'weikanCtrl', require( './weikanCtrl' ) )
 
-},{"./weikanCtrl":12,"./weikanService":13}],12:[function(require,module,exports){
-module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService',
-    function ( $scope, weikanService, $window, settingsService, ListService ) {
+.controller( 'GridPlayCtrl', require( './GridPlayCtrl' ) )
+
+},{"./GridPlayCtrl":11,"./weikanCtrl":13,"./weikanService":14}],13:[function(require,module,exports){
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast',
+    function ( $scope, weikanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast ) {
         var vm = this;
 
         vm.settings = settingsService.loadSettings();
@@ -510,11 +531,29 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
             vm.flushdir();
             $scope.$apply();
           }, 1000 * $scope.timelist[vm.settings.weikan.flushtime].number * $scope.timelist[vm.settings.weikan.flushtime].bei);
-        }
+        };
+
+        $scope.showGridBottomSheet = function() {
+          $scope.alert = '';
+          $mdBottomSheet.show({
+            templateUrl: 'static/view/play-grid.html',
+            controller: 'GridPlayCtrl',
+            clickOutsideToClose: false
+          }).then(function(clickedItem) {
+            $mdToast.show(
+                  $mdToast.simple()
+                    .textContent(clickedItem['name'] + ' clicked!')
+                    .position('top right')
+                    .hideDelay(1500)
+                );
+          }).catch(function(error) {
+            // User clicked outside or hit escape
+          });
+        };
     }
 ];
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = [ '$window',
     function ( $window ) {
         
