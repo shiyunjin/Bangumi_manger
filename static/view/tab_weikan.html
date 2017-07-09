@@ -40,12 +40,12 @@
   </md-toolbar>
   <md-virtual-repeat-container ng-style="liststyle">
     <md-list ng-cloak>
-      <md-list-item class="secondary-button-padding"  ng-click="showGridBottomSheet()" md-virtual-repeat="item in weikan_list_menu | orderBy: item:false">
+      <md-list-item class="secondary-button-padding" ng-click="showGridBottomSheet(item)" md-virtual-repeat="item in weikan_list_menu | orderBy: item:false">
         <p>{{item}}</p>
 
         <md-icon icon-font-library="material-icons"  ng-click="doSecondaryAction($event)" aria-label="top" class="md-secondary md-hue-3" >eject</md-icon>
         <md-icon icon-font-library="material-icons"  ng-click="doSecondaryAction($event)" aria-label="top" class="md-secondary" >build</md-icon>
-        <md-button class="md-secondary md-raised md-primary">播放</md-button>
+        <md-button class="md-secondary md-raised md-primary" ng-click="showGridBottomSheet(item)">播放</md-button>
       </md-list-item>
     </md-list>
   </md-virtual-repeat-container>

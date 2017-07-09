@@ -90,7 +90,7 @@ radioit.controller( 'AppCtrl',
 )
 ;
 
-},{"./main":6}],3:[function(require,module,exports){
+},{"./main":10}],3:[function(require,module,exports){
 var radioit = require( './main' );
 
 
@@ -127,14 +127,193 @@ radioit.directive( 'closeButton',
 )
 ;
 
-},{"./main":6}],4:[function(require,module,exports){
+},{"./main":10}],4:[function(require,module,exports){
 require( './main' )
-},{"./main":6}],5:[function(require,module,exports){
+},{"./main":10}],5:[function(require,module,exports){
+module.exports = angular.module( 'bangumi.kanwan', [] )
+
+.service( 'kanwanService', require( './kanwanService' ) )
+
+.controller( 'kanwanCtrl', require( './kanwanCtrl' ) )
+
+.controller( 'GridPlayCtrl', require( '../weikan/GridPlayCtrl' ) )
+
+.filter('clarityIcon',require( '../weikan/clarityIcon' ) )
+
+.controller( 'playPanelCtrl-kanwan', require( './playPanelCtrl' ) )
+
+},{"../weikan/GridPlayCtrl":15,"../weikan/clarityIcon":16,"./kanwanCtrl":6,"./kanwanService":7,"./playPanelCtrl":8}],6:[function(require,module,exports){
+module.exports = [ '$scope', 'kanwanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast', '$mdPanel',
+    function ( $scope, kanwanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast, $mdPanel ) {
+        var vm = this;
+
+        vm.settings = settingsService.loadSettings();
+
+
+        $scope.weikan_file_list = [];
+        $scope.weikan_video_list = [];
+        $scope.weikan_list = [];
+        $scope.weikan_list_menu = [];
+        $scope.weikan_list_content = {};
+        $scope.weikan_count = 0;
+
+        $scope.liststyle = {
+            'width': '100%',
+            'height': '581px'
+        };
+        $scope.loading = true;
+
+        vm.flushdir = function () {
+            $scope.loading = true;
+
+            var block_test_list={};
+
+            $scope.weikan_file_list = [];
+            $scope.weikan_video_list = [];
+            $scope.weikan_list = [];
+            $scope.weikan_list_menu = [];
+            $scope.weikan_list_content = {};
+            $scope.weikan_count = 0;
+
+            if(vm.settings.fooder.kanwan){
+              $window.App.fs.readdir(vm.settings.fooder.kanwan,function (err, files) {
+                $scope.weikan_file_list=files;
+                if($scope.weikan_file_list.length){
+                  $scope.weikan_file_list.forEach(function (key) {
+                    var ext=key.substring(key.lastIndexOf('.') + 1).toLowerCase();
+                    if(ext=='mp4'){
+                      $scope.weikan_video_list.push(key);
+                    }
+                  });
+                  $scope.weikan_video_list.forEach(function (key) {
+                    switch(key.substr(0,1)) {
+                      case '[':
+                        ListService.getfang(key,block_test_list,function (obj) {
+                          $scope.weikan_list.push(obj);
+                          var lowname = obj.name.toLowerCase();
+                          if(typeof($scope.weikan_list_content[lowname])=="undefined"){
+                            $scope.weikan_list_menu.push(obj.name);
+                            $scope.weikan_list_content[lowname]=[];
+                          }
+                          $scope.weikan_list_content[lowname].push(obj);
+                          $scope.weikan_count++;
+                        });
+                      break;
+                      case '【':
+                        ListService.getfang(key,block_test_list,function (obj) {
+                          $scope.weikan_list.push(obj);
+                          var lowname = obj.name.toLowerCase();
+                          if(typeof($scope.weikan_list_content[lowname])=="undefined"){
+                            $scope.weikan_list_menu.push(obj.name);
+                            $scope.weikan_list_content[lowname]=[];
+                          }
+                          $scope.weikan_list_content[lowname].push(obj);
+                          $scope.weikan_count++;
+                        });
+                      break;
+                      default:
+
+                      break;
+                    }
+                  });
+                  $scope.loading = false;
+                  $scope.$apply();
+                }
+              });
+            };
+        };
+
+
+        $scope.load = function () {
+          vm.flushdir();
+        };
+
+        $scope.showGridBottomSheet = function(name) {
+          $scope.alert = '';
+          var lowname = name.toLowerCase();
+          $mdBottomSheet.show({
+            templateUrl: 'static/view/play-grid.html',
+            controller: 'GridPlayCtrl',
+            clickOutsideToClose: false,
+            locals: {
+              list: $scope.weikan_list_content[lowname]
+            }
+          }).then(function(clickedItem) {
+            var position = $mdPanel.newPanelPosition()
+                .absolute()
+                .center();
+
+            var config = {
+              controller: 'playPanelCtrl-kanwan',
+              controllerAs: 'ctrl',
+              disableParentScroll: false,
+              templateUrl: 'static/view/play-panel.html',
+              hasBackdrop: true,
+              panelClass: 'play-dialog',
+              position: position,
+              locals: {
+                list:clickedItem
+              },
+              trapFocus: true,
+              zIndex: 150,
+              clickOutsideToClose: false,
+              escapeToClose: true,
+              focusOnOpen: true
+            };
+            $mdPanel.open(config);
+          }).catch(function(error) {
+            // User clicked outside or hit escape
+          });
+        };
+    }
+];
+
+},{}],7:[function(require,module,exports){
+module.exports = [ '$window',
+    function ( $window ) {
+
+    }
+]
+
+},{}],8:[function(require,module,exports){
+module.exports = [ '$scope', 'kanwanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast', 'list', 'mdPanelRef',
+    function ( $scope, kanwanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast, list, mdPanelRef ) {
+      this._mdPanelRef = mdPanelRef;
+      this.settings = settingsService.loadSettings();
+
+      $scope.item = list;
+      $scope.allowkanwan = false;
+
+      this.closeDialog = function() {
+        var panelRef = this._mdPanelRef;
+
+        panelRef && panelRef.close().then(function() {
+          panelRef.destroy();
+        });
+      };
+
+      this.openfile = function (filename) {
+        $window.App.openfile(this.settings.fooder.kanwan + '\\' + filename);
+      };
+
+      this.unlink = function (filename) {
+        return $window.App.fs.unlinkSync(this.settings.fooder.kanwan + '\\' + filename);
+        var panelRef = this._mdPanelRef;
+
+        panelRef && panelRef.close().then(function() {
+          panelRef.destroy();
+        });
+      };
+
+    }
+];
+
+},{}],9:[function(require,module,exports){
 module.exports = [ '$window',
     function ( $window ) {
         this.getfang = function ( key , block_test_list, callback ) {
-            var reg = /(?:\[)[^\[\]]*(?:\])/g;
-            var nokreg= /((?:\])[^\[\]]{1,}(?:\[)|(?:\])[^\[\.]{1,}(?:\.))/g;
+            var reg = /(?:(\[|\【))[^\[\]]*(?:(\]|\】))/g;
+            var nokreg= /((?:(\]|\】))[^\[\]\】\【]{1,}(?:(\[|\【))|(?:(\]|\】))[^\[\【\.\]\】]{1,}(?:\.))/g;
             var res = key.match(reg);
             var info = {};
             info['file']=key;
@@ -216,13 +395,21 @@ module.exports = [ '$window',
                 case '日语版':
 
                 break;
+                case 'MP4':
+
+                break;
                 default:
                   if(item_upper.indexOf('AAC')>=0 || item_upper.indexOf('X264')>=0 || (item_upper.indexOf('第')>=0 && (item_upper.indexOf('季')>=0))|| item_upper.indexOf('HDRIP')>=0)
                     nowlenght--;
                   else if(!info['number']){
                     var temp=item_upper.toLowerCase().match(/(?![0-9a-zA-Z ]*\.)(?![0-9a-zA-Z ]*p)(?![0-9a-zA-Z ]*P)(?![0-9a-zA-Z ]*X)(?![0-9a-zA-Z ]*x)[0-9a-zA-Z ]*[^\s]/);
-                    if(temp && typeof(temp[0])!=undefined && !isNaN(temp[0])){
-                      info['number']=temp[0];
+                    if(temp && typeof(temp[0])!=undefined){
+                      var daiv=temp[0].match(/[0-9]{1,}(v|V)[0-9]{1,}/);
+                      if(!isNaN(temp[0])){
+                        info['number']=temp[0];
+                      }else if(daiv && typeof(daiv[0])!=undefined){
+                        info['number']=daiv[0];
+                      }
                     }
                   }
                   nowlenght++;
@@ -254,10 +441,30 @@ module.exports = [ '$window',
             }
             if(info['name'].indexOf(' ')>=0 && !info['number']){
               var temp = info['name'].split(' ');
+              if(temp[temp.length-1]=='')
+                temp.pop();
               var tempnumber = temp[temp.length-1];
-              if(tempnumber.length == 2 && !isNaN(tempnumber)){
+              if((tempnumber.length == 2 || tempnumber.length == 3 || tempnumber.length == 4) && !isNaN(tempnumber)){
                 info['number']=tempnumber;
                 temp.pop();
+                info['name'] = temp.join(' ');
+              }else if(tempnumber=='720P' || tempnumber=='720p'){
+                var tempnumber = temp[temp.length-2];
+                info['clarity']='720P';
+                temp.pop();
+                if((tempnumber.length == 2 || tempnumber.length == 3 || tempnumber.length == 4) && !isNaN(tempnumber)){
+                  info['number']=tempnumber;
+                  temp.pop();
+                }
+                info['name'] = temp.join(' ');
+              }else if(tempnumber=='1080p' || tempnumber=='1080P'){
+                var tempnumber = temp[temp.length-2];
+                info['clarity']='1080P';
+                temp.pop();
+                if((tempnumber.length == 2 || tempnumber.length == 3 || tempnumber.length == 4) && !isNaN(tempnumber)){
+                  info['number']=tempnumber;
+                  temp.pop();
+                }
                 info['name'] = temp.join(' ');
               }
             }
@@ -277,14 +484,15 @@ module.exports = [ '$window',
     }
 ]
 
-},{}],6:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = angular.module( 'bangumi', [
     'ngMaterial',
     'ngMessages',
     'ui.router',
     'angularLazyImg',
     require( './settings' ).name,
-    require( './weikan' ).name
+    require( './weikan' ).name,
+    require( './kanwan' ).name
     ])
 
 .config( function ( $stateProvider ) {
@@ -321,7 +529,7 @@ require( './services' );
 require( './controllers' );
 require( './directives' );
 
-},{"./controllers":2,"./directives":3,"./list":5,"./services":7,"./settings":8,"./weikan":12}],7:[function(require,module,exports){
+},{"./controllers":2,"./directives":3,"./kanwan":5,"./list":9,"./services":11,"./settings":12,"./weikan":17}],11:[function(require,module,exports){
 var radioit = require( './main' );
 
 radioit.service( 'appService',
@@ -341,14 +549,14 @@ radioit.service( 'appService',
     }]
 );
 
-},{"./main":6}],8:[function(require,module,exports){
+},{"./main":10}],12:[function(require,module,exports){
 module.exports = angular.module( 'bangumi.settings', [] )
 
 .service( 'settingsService', require( './settingsService' ) )
 
 .controller( 'SettingsCtrl', require( './settingsCtrl' ) )
 
-},{"./settingsCtrl":9,"./settingsService":10}],9:[function(require,module,exports){
+},{"./settingsCtrl":13,"./settingsService":14}],13:[function(require,module,exports){
 module.exports = [ '$scope', 'settingsService', '$window',
     function ( $scope, settingsService, $window ) {
         var vm = this;
@@ -399,7 +607,7 @@ module.exports = [ '$scope', 'settingsService', '$window',
     }
 ]
 
-},{"../../../package.json":1}],10:[function(require,module,exports){
+},{"../../../package.json":1}],14:[function(require,module,exports){
 module.exports = [ '$window',
     function ( $window ) {
         this.loadSettings = function () {
@@ -411,17 +619,10 @@ module.exports = [ '$window',
         }
     }
 ]
-},{}],11:[function(require,module,exports){
-module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService',
-    function ( $scope, weikanService, $window, settingsService, ListService ) {
-      $scope.items = [
-        { name: 'Hangout', icon: 'hangout' },
-        { name: 'Mail', icon: 'mail' },
-        { name: 'Message', icon: 'message' },
-        { name: 'Copy', icon: 'copy2' },
-        { name: 'Facebook', icon: 'facebook' },
-        { name: 'Twitter', icon: 'twitter' },
-      ];
+},{}],15:[function(require,module,exports){
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast', 'list',
+    function ( $scope, weikanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast, list ) {
+      $scope.items = list;
 
       $scope.listItemClick = function($index) {
         var clickedItem = $scope.items[$index];
@@ -430,7 +631,28 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
     }
 ];
 
-},{}],12:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+module.exports = [
+  function() {
+      return function(text) {
+          var icon='movie';
+          switch(text){
+            case '480P':
+              icon='theaters';
+            break;
+            case '720P':
+              icon='hd';
+            break;
+            case '1080P':
+              icon='high_quality';
+            break;
+          }
+          return icon;
+      }
+  }
+];
+
+},{}],17:[function(require,module,exports){
 module.exports = angular.module( 'bangumi.weikan', [] )
 
 .service( 'weikanService', require( './weikanService' ) )
@@ -439,9 +661,55 @@ module.exports = angular.module( 'bangumi.weikan', [] )
 
 .controller( 'GridPlayCtrl', require( './GridPlayCtrl' ) )
 
-},{"./GridPlayCtrl":11,"./weikanCtrl":13,"./weikanService":14}],13:[function(require,module,exports){
-module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast',
-    function ( $scope, weikanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast ) {
+.filter('clarityIcon',require( './clarityIcon' ) )
+
+.controller( 'playPanelCtrl-weikan', require( './playPanelCtrl' ) )
+
+},{"./GridPlayCtrl":15,"./clarityIcon":16,"./playPanelCtrl":18,"./weikanCtrl":19,"./weikanService":20}],18:[function(require,module,exports){
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast', 'list', 'mdPanelRef',
+    function ( $scope, weikanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast, list, mdPanelRef ) {
+      this._mdPanelRef = mdPanelRef;
+      this.settings = settingsService.loadSettings();
+
+      $scope.item = list;
+      $scope.allowkanwan = true;
+
+      this.closeDialog = function() {
+        var panelRef = this._mdPanelRef;
+
+        panelRef && panelRef.close().then(function() {
+          panelRef.destroy();
+        });
+      };
+
+      this.openfile = function (filename) {
+        $window.App.openfile(this.settings.fooder.weikan + '\\' + filename);
+      };
+
+      this.movetokanwan = function (filename) {
+        $window.App.fs.renameSync(this.settings.fooder.weikan + '\\' + filename,this.settings.fooder.kanwan + '\\' + filename);
+        var panelRef = this._mdPanelRef;
+
+        panelRef && panelRef.close().then(function() {
+          panelRef.destroy();
+        });
+      };
+
+      this.unlink = function (filename) {
+        return $window.App.fs.unlinkSync(this.settings.fooder.weikan + '\\' + filename);
+        var panelRef = this._mdPanelRef;
+
+        panelRef && panelRef.close().then(function() {
+          panelRef.destroy();
+        });
+      };
+
+    }
+];
+
+},{}],19:[function(require,module,exports){
+module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast', '$mdPanel',
+    function ( $scope, weikanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast, $mdPanel ) {
         var vm = this;
 
         vm.settings = settingsService.loadSettings();
@@ -504,7 +772,16 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
                         });
                       break;
                       case '【':
-
+                        ListService.getfang(key,block_test_list,function (obj) {
+                          $scope.weikan_list.push(obj);
+                          var lowname = obj.name.toLowerCase();
+                          if(typeof($scope.weikan_list_content[lowname])=="undefined"){
+                            $scope.weikan_list_menu.push(obj.name);
+                            $scope.weikan_list_content[lowname]=[];
+                          }
+                          $scope.weikan_list_content[lowname].push(obj);
+                          $scope.weikan_count++;
+                        });
                       break;
                       default:
 
@@ -533,19 +810,39 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
           }, 1000 * $scope.timelist[vm.settings.weikan.flushtime].number * $scope.timelist[vm.settings.weikan.flushtime].bei);
         };
 
-        $scope.showGridBottomSheet = function() {
+        $scope.showGridBottomSheet = function(name) {
           $scope.alert = '';
+          var lowname = name.toLowerCase();
           $mdBottomSheet.show({
             templateUrl: 'static/view/play-grid.html',
             controller: 'GridPlayCtrl',
-            clickOutsideToClose: false
+            clickOutsideToClose: false,
+            locals: {
+              list: $scope.weikan_list_content[lowname]
+            }
           }).then(function(clickedItem) {
-            $mdToast.show(
-                  $mdToast.simple()
-                    .textContent(clickedItem['name'] + ' clicked!')
-                    .position('top right')
-                    .hideDelay(1500)
-                );
+            var position = $mdPanel.newPanelPosition()
+                .absolute()
+                .center();
+
+            var config = {
+              controller: 'playPanelCtrl-weikan',
+              controllerAs: 'ctrl',
+              disableParentScroll: false,
+              templateUrl: 'static/view/play-panel.html',
+              hasBackdrop: true,
+              panelClass: 'play-dialog',
+              position: position,
+              locals: {
+                list:clickedItem
+              },
+              trapFocus: true,
+              zIndex: 150,
+              clickOutsideToClose: false,
+              escapeToClose: true,
+              focusOnOpen: true
+            };
+            $mdPanel.open(config);
           }).catch(function(error) {
             // User clicked outside or hit escape
           });
@@ -553,7 +850,7 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
     }
 ];
 
-},{}],14:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 module.exports = [ '$window',
     function ( $window ) {
         

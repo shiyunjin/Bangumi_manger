@@ -1,0 +1,42 @@
+<div flex ng-controller="kanwanCtrl as weikan" data-ng-init="load()">
+  <md-toolbar class="md-theme-light" style="background-color: #374851;">
+    <div class="md-toolbar-tools">
+      <md-button class="md-icon-button" aria-label="Favorite" ng-click="weikan.flushdir()">
+        <md-icon icon-font-library="material-icons">loop</md-icon>
+      </md-button>
+      <h2>待看 {{weikan_list_menu.length}} 部 总共 {{weikan_count}} 个视频</h2>
+      <span flex></span>
+      <md-menu md-position-mode="target-right target">
+        <md-button class="md-icon-button" aria-label="More" ng-click="$mdMenu.open($event)">
+          <md-icon icon-font-library="material-icons">more_vert</md-icon>
+        </md-button>
+        <md-menu-content width="2" ng-controller="SettingsCtrl as settings">
+          <md-menu-item>
+            <md-button ng-click="settings.setkanwan();">
+              <div layout="row" flex>
+                <p flex>设置目录</p>
+              </div>
+            </md-button>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+    </div>
+    <md-progress-linear md-mode="indeterminate" ng-disabled="!loading"></md-progress-linear>
+  </md-toolbar>
+  <md-virtual-repeat-container ng-style="liststyle">
+    <md-list ng-cloak>
+      <md-list-item class="secondary-button-padding" ng-click="showGridBottomSheet(item)" md-virtual-repeat="item in weikan_list_menu | orderBy: item:false">
+        <p>{{item}}</p>
+
+        <md-icon icon-font-library="material-icons"  ng-click="doSecondaryAction($event)" aria-label="top" class="md-secondary" >build</md-icon>
+        <md-button class="md-secondary md-raised md-primary" ng-click="showGridBottomSheet(item)">播放</md-button>
+      </md-list-item>
+    </md-list>
+  </md-virtual-repeat-container>
+  <div ng-if="alert">
+    <br/>
+    <b layout="row" layout-align="center center" class="md-padding">
+      {{alert}}
+    </b>
+  </div>
+</div>

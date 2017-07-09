@@ -1,0 +1,45 @@
+<div role="dialog" aria-label="Eat me!" layout="column" layout-align="center center">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>{{item.file}}</h2>
+    </div>
+  </md-toolbar>
+
+  <div class="play-dialog-content">
+    <p ng-if="item.ass">
+      字幕组: {{item.ass}}
+    </p>
+    <p ng-if="item.name">
+      名字: {{item.name}}
+    </p>
+    <p ng-if="item.clarity">
+      清晰度: {{item.clarity}}
+    </p>
+    <p ng-if="item.number">
+      集数: {{item.number}}
+    </p>
+
+    <div layout="row" >
+      <div layout="row" layout-align="start center" flex>
+        <md-button class="md-fab md-primary" ng-click="ctrl.openfile(item.file)">
+          <md-icon icon-font-library="material-icons">play_arrow</md-icon>
+        </md-button>
+        <md-button class="md-icon-button" ng-click="ctrl.movetokanwan(item.file)" ng-show="allowkanwan">
+          <md-icon icon-font-library="material-icons">queue_play_next</md-icon>
+        </md-button>
+      </div>
+      <div layout="row" layout-align="end center" flex>
+        <md-button class="md-raised md-warn" ng-disabled="!deletetrue" ng-click="ctrl.unlink(item.file)">
+          <md-icon icon-font-library="material-icons">delete</md-icon>
+        </md-button>
+        <md-checkbox ng-model="deletetrue" style="margin-top: 13px;">
+      </div>
+    </div>
+  </div>
+
+  <div layout="row" class="play-dialog-button">
+    <md-button md-autofocus flex class="md-primary" ng-click="ctrl.closeDialog()">
+      关闭
+    </md-button>
+  </div>
+</div>

@@ -4,7 +4,8 @@ module.exports = angular.module( 'bangumi', [
     'ui.router',
     'angularLazyImg',
     require( './settings' ).name,
-    require( './weikan' ).name
+    require( './weikan' ).name,
+    require( './kanwan' ).name
     ])
 
 .config( function ( $stateProvider ) {

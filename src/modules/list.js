@@ -1,8 +1,8 @@
 module.exports = [ '$window',
     function ( $window ) {
         this.getfang = function ( key , block_test_list, callback ) {
-            var reg = /(?:\[)[^\[\]]*(?:\])/g;
-            var nokreg= /((?:\])[^\[\]]{1,}(?:\[)|(?:\])[^\[\.]{1,}(?:\.))/g;
+            var reg = /(?:(\[|\【))[^\[\]]*(?:(\]|\】))/g;
+            var nokreg= /((?:(\]|\】))[^\[\]\】\【]{1,}(?:(\[|\【))|(?:(\]|\】))[^\[\【\.\]\】]{1,}(?:\.))/g;
             var res = key.match(reg);
             var info = {};
             info['file']=key;
@@ -84,13 +84,21 @@ module.exports = [ '$window',
                 case '日语版':
 
                 break;
+                case 'MP4':
+
+                break;
                 default:
                   if(item_upper.indexOf('AAC')>=0 || item_upper.indexOf('X264')>=0 || (item_upper.indexOf('第')>=0 && (item_upper.indexOf('季')>=0))|| item_upper.indexOf('HDRIP')>=0)
                     nowlenght--;
                   else if(!info['number']){
                     var temp=item_upper.toLowerCase().match(/(?![0-9a-zA-Z ]*\.)(?![0-9a-zA-Z ]*p)(?![0-9a-zA-Z ]*P)(?![0-9a-zA-Z ]*X)(?![0-9a-zA-Z ]*x)[0-9a-zA-Z ]*[^\s]/);
-                    if(temp && typeof(temp[0])!=undefined && !isNaN(temp[0])){
-                      info['number']=temp[0];
+                    if(temp && typeof(temp[0])!=undefined){
+                      var daiv=temp[0].match(/[0-9]{1,}(v|V)[0-9]{1,}/);
+                      if(!isNaN(temp[0])){
+                        info['number']=temp[0];
+                      }else if(daiv && typeof(daiv[0])!=undefined){
+                        info['number']=daiv[0];
+                      }
                     }
                   }
                   nowlenght++;
@@ -122,10 +130,30 @@ module.exports = [ '$window',
             }
             if(info['name'].indexOf(' ')>=0 && !info['number']){
               var temp = info['name'].split(' ');
+              if(temp[temp.length-1]=='')
+                temp.pop();
               var tempnumber = temp[temp.length-1];
-              if(tempnumber.length == 2 && !isNaN(tempnumber)){
+              if((tempnumber.length == 2 || tempnumber.length == 3 || tempnumber.length == 4) && !isNaN(tempnumber)){
                 info['number']=tempnumber;
                 temp.pop();
+                info['name'] = temp.join(' ');
+              }else if(tempnumber=='720P' || tempnumber=='720p'){
+                var tempnumber = temp[temp.length-2];
+                info['clarity']='720P';
+                temp.pop();
+                if((tempnumber.length == 2 || tempnumber.length == 3 || tempnumber.length == 4) && !isNaN(tempnumber)){
+                  info['number']=tempnumber;
+                  temp.pop();
+                }
+                info['name'] = temp.join(' ');
+              }else if(tempnumber=='1080p' || tempnumber=='1080P'){
+                var tempnumber = temp[temp.length-2];
+                info['clarity']='1080P';
+                temp.pop();
+                if((tempnumber.length == 2 || tempnumber.length == 3 || tempnumber.length == 4) && !isNaN(tempnumber)){
+                  info['number']=tempnumber;
+                  temp.pop();
+                }
                 info['name'] = temp.join(' ');
               }
             }

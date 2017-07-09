@@ -1,16 +1,9 @@
-module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast', '$mdPanel',
-    function ( $scope, weikanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast, $mdPanel ) {
+module.exports = [ '$scope', 'kanwanService', '$window', 'settingsService', 'ListService', '$mdBottomSheet', '$mdToast', '$mdPanel',
+    function ( $scope, kanwanService, $window, settingsService, ListService, $mdBottomSheet, $mdToast, $mdPanel ) {
         var vm = this;
 
         vm.settings = settingsService.loadSettings();
 
-        $scope.timelist = [
-          {'id':0,'title':'5 分钟','number':'5','bei':'60'},
-          {'id':1,'title':'10 分钟','number':'10','bei':'60'},
-          {'id':2,'title':'30 分钟','number':'30','bei':'60'}
-        ];
-
-        var timeClock = null;
 
         $scope.weikan_file_list = [];
         $scope.weikan_video_list = [];
@@ -37,8 +30,8 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
             $scope.weikan_list_content = {};
             $scope.weikan_count = 0;
 
-            if(vm.settings.fooder.weikan){
-              $window.App.fs.readdir(vm.settings.fooder.weikan,function (err, files) {
+            if(vm.settings.fooder.kanwan){
+              $window.App.fs.readdir(vm.settings.fooder.kanwan,function (err, files) {
                 $scope.weikan_file_list=files;
                 if($scope.weikan_file_list.length){
                   $scope.weikan_file_list.forEach(function (key) {
@@ -85,19 +78,9 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
             };
         };
 
-        vm.settime = function (id) {
-          vm.settings.weikan.flushtime = id;
-          settingsService.saveSettings( vm.settings );
-          clearTimeout(timeClock);
-          $scope.load();
-        };
 
         $scope.load = function () {
           vm.flushdir();
-          timeClock = setInterval( function () {
-            vm.flushdir();
-            $scope.$apply();
-          }, 1000 * $scope.timelist[vm.settings.weikan.flushtime].number * $scope.timelist[vm.settings.weikan.flushtime].bei);
         };
 
         $scope.showGridBottomSheet = function(name) {
@@ -116,7 +99,7 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
                 .center();
 
             var config = {
-              controller: 'playPanelCtrl-weikan',
+              controller: 'playPanelCtrl-kanwan',
               controllerAs: 'ctrl',
               disableParentScroll: false,
               templateUrl: 'static/view/play-panel.html',
