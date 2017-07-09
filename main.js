@@ -7,7 +7,7 @@ const env = require( './lib/env.js' );
 const path = require('path');
 const url = require('url');
 
-let isDevelopment = true;
+let isDevelopment = false;
 
 // if (isDevelopment) {
 //     require('electron-reload')(__dirname, {
