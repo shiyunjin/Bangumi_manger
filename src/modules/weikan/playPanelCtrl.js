@@ -28,7 +28,7 @@ module.exports = [ '$scope', 'weikanService', '$window', 'settingsService', 'Lis
       };
 
       this.unlink = function (filename) {
-        return $window.App.fs.unlinkSync(this.settings.fooder.weikan + '\\' + filename);
+        $window.App.fs.unlinkSync(this.settings.fooder.weikan + '\\' + filename);
         var panelRef = this._mdPanelRef;
 
         panelRef && panelRef.close().then(function() {
