@@ -19,7 +19,7 @@ module.exports = [ '$scope', 'kanwanService', '$window', 'settingsService', 'Lis
       };
 
       this.unlink = function (filename) {
-        return $window.App.fs.unlinkSync(this.settings.fooder.kanwan + '\\' + filename);
+        $window.App.fs.unlinkSync(this.settings.fooder.kanwan + '\\' + filename);
         var panelRef = this._mdPanelRef;
 
         panelRef && panelRef.close().then(function() {
