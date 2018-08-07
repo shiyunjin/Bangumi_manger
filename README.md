@@ -1,4 +1,4 @@
-# Bangumi_manger
+# Bangumi Manger
 一个方便快捷的追番管理系统
 
 ## 介绍
